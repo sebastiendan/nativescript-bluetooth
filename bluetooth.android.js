@@ -92,7 +92,7 @@ Bluetooth._connections = {};
   if (android.os.Build.VERSION.SDK_INT >= 21 /*android.os.Build.VERSION_CODES.LOLLIPOP */) {
     var MyAdvertiseCallback = android.bluetooth.le.AdvertiseCallback.extend({
       onStartFailure: function(errorCode) {
-        console.log("------- advertiseCallback.onStartFailure errorCode: " + errorCode);
+        console.log("Ble_advertising ------- advertiseCallback.onStartFailure errorCode: " + errorCode);
         var errorMessage;
         if (errorCode == android.bluetooth.le.AdvertiseCallback.ADVERTISE_FAILED_ALREADY_STARTED) {
           errorMessage = "Advertisement already started";
@@ -107,20 +107,20 @@ Bluetooth._connections = {};
         } else {
           errorMessage = "Advertisement failed to start";
         }
-        console.log("------- advertiseCallback.onStartFailure errorMessage: " + errorMessage);
+        console.log("Ble_advertising ------- advertiseCallback.onStartFailure errorMessage: " + errorMessage);
       },
       onStartSuccess: function(settings) {
-        console.log("Advertisement success -------------");
+        console.log("Ble_advertising Advertisement success -------------");
         console.log(settings);
-        console.log("-------------");
+        console.log("Ble_advertising -------------");
       }
     }),
     MyScanCallback = android.bluetooth.le.ScanCallback.extend({
       onBatchScanResults: function(results) {
-        console.log("------- scanCallback.onBatchScanResults");
+        console.log("Ble_advertising ------- scanCallback.onBatchScanResults");
       },
       onScanFailed: function(errorCode) {
-        console.log("------- scanCallback.onScanFailed errorCode: " + errorCode);
+        console.log("Ble_advertising ------- scanCallback.onScanFailed errorCode: " + errorCode);
         var errorMessage;
         if (errorCode == android.bluetooth.le.ScanCallback.SCAN_FAILED_ALREADY_STARTED) {
           errorMessage = "Scan already started";
@@ -133,7 +133,7 @@ Bluetooth._connections = {};
         } else {
           errorMessage = "Scan failed to start";
         }
-        console.log("------- scanCallback.onScanFailed errorMessage: " + errorMessage);
+        console.log("Ble_advertising ------- scanCallback.onScanFailed errorMessage: " + errorMessage);
       },
       onScanResult: function(callbackType, result) {
         var stateObject = Bluetooth._connections[result.getDevice().getAddress()];
@@ -149,7 +149,7 @@ Bluetooth._connections = {};
             state: 'disconnected',
             advertisement: android.util.Base64.encodeToString(result.getScanRecord().getBytes(), android.util.Base64.NO_WRAP)
           };
-          console.log("---- Lollipop+ scanCallback result: " + JSON.stringify(payload));
+          console.log("Ble_advertising ---- Lollipop+ scanCallback result: " + JSON.stringify(payload));
           onDiscovered(payload);
         }
       }
@@ -190,11 +190,11 @@ Bluetooth._MyGattCallback = android.bluetooth.BluetoothGattCallback.extend({
    * 3: disconnecting
    */
   onConnectionStateChange: function(bluetoothGatt, status, newState) {
-    console.log("------- _MyGattCallback.onConnectionStateChange, status: " + status + ", new state: " + newState);
+    console.log("Ble_advertising ------- _MyGattCallback.onConnectionStateChange, status: " + status + ", new state: " + newState);
 
     // https://github.com/don/cordova-plugin-ble-central/blob/master/src/android/Peripheral.java#L191
     if (newState == 2 /* connected */ && status === 0 /* gatt success */) {
-      console.log("---- discovering services..");
+      console.log("Ble_advertising ---- discovering services..");
       bluetoothGatt.discoverServices();
     } else {
       // perhaps the device was manually disconnected, or in use by another device
@@ -203,7 +203,7 @@ Bluetooth._MyGattCallback = android.bluetooth.BluetoothGattCallback.extend({
   },
 
   onServicesDiscovered: function(bluetoothGatt, status) {
-    console.log("------- _MyGattCallback.onServicesDiscovered, status (0=success): " + status);
+    console.log("Ble_advertising ------- _MyGattCallback.onServicesDiscovered, status (0=success): " + status);
 
     if (status === 0 /* gatt success */) {
       // TODO grab from cached object and extend with services data?
@@ -301,7 +301,7 @@ Bluetooth._MyGattCallback = android.bluetooth.BluetoothGattCallback.extend({
 
   onCharacteristicRead: function(bluetoothGatt, bluetoothGattCharacteristic, status) {
     if (Bluetooth.characteristicLogging) {
-      console.log("------- _MyGattCallback.onCharacteristicRead");
+      console.log("Ble_advertising ------- _MyGattCallback.onCharacteristicRead");
     }
 
     var device = bluetoothGatt.getDevice();
@@ -323,7 +323,7 @@ Bluetooth._MyGattCallback = android.bluetooth.BluetoothGattCallback.extend({
 
   onCharacteristicChanged: function(bluetoothGatt, bluetoothGattCharacteristic) {
     if (Bluetooth.characteristicLogging) {
-      console.log("------- _MyGattCallback.onCharacteristicChanged");
+      console.log("Ble_advertising ------- _MyGattCallback.onCharacteristicChanged");
     }
 
     var device = bluetoothGatt.getDevice();
@@ -345,7 +345,7 @@ Bluetooth._MyGattCallback = android.bluetooth.BluetoothGattCallback.extend({
 
   onCharacteristicWrite: function(bluetoothGatt, bluetoothGattCharacteristic, status) {
     if (Bluetooth.characteristicLogging) {
-      console.log("------- _MyGattCallback.onCharacteristicWrite");
+      console.log("Ble_advertising ------- _MyGattCallback.onCharacteristicWrite");
     }
 
     var device = bluetoothGatt.getDevice();
@@ -367,19 +367,19 @@ Bluetooth._MyGattCallback = android.bluetooth.BluetoothGattCallback.extend({
   },
 
   onDescriptorRead: function(bluetoothGatt, bluetoothGattDescriptor, status) {
-    console.log("------- _MyGattCallback.onDescriptorRead");
+    console.log("Ble_advertising ------- _MyGattCallback.onDescriptorRead");
   },
 
   onDescriptorWrite: function(bluetoothGatt, bluetoothGattDescriptor, status) {
-    console.log("------- _MyGattCallback.onDescriptorWrite");
+    console.log("Ble_advertising ------- _MyGattCallback.onDescriptorWrite");
   },
 
   onReadRemoteRssi: function(bluetoothGatt, rssi, status) {
-    console.log("------- _MyGattCallback.onReadRemoteRssi");
+    console.log("Ble_advertising ------- _MyGattCallback.onReadRemoteRssi");
   },
 
   onMtuChanged: function(bluetoothGatt, mtu, status) {
-    console.log("------- _MyGattCallback.onMtuChanged");
+    console.log("Ble_advertising ------- _MyGattCallback.onMtuChanged");
   }
 });
 
@@ -394,7 +394,7 @@ Bluetooth.enable = function () {
       var intent = new android.content.Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE);
       application.android.foregroundActivity.startActivityForResult(intent, ACTION_REQUEST_ENABLE_BLUETOOTH_REQUEST_CODE);
     } catch (ex) {
-      console.log("Error in Bluetooth.enable: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.enable: " + ex);
       reject(ex);
     }
   });
@@ -405,7 +405,7 @@ Bluetooth.isBluetoothEnabled = function () {
     try {
       resolve(Bluetooth._isEnabled());
     } catch (ex) {
-      console.log("Error in Bluetooth.isBluetoothEnabled: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.isBluetoothEnabled: " + ex);
       reject(ex);
     }
   });
@@ -468,7 +468,7 @@ Bluetooth.startAdvertising = function (arg) {
       }
 
     } catch (ex) {
-      console.log("Error in Bluetooth.startAdvertising: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.startAdvertising: " + ex);
       reject(ex);
     }
   });
@@ -488,7 +488,7 @@ Bluetooth.stopAdvertising = function () {
       }
       resolve();
     } catch (ex) {
-      console.log("Error in Bluetooth.stopAdvertising: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.stopAdvertising: " + ex);
       reject(ex);
     }
   });
@@ -576,7 +576,7 @@ Bluetooth.startScanning = function (arg) {
       }
 
     } catch (ex) {
-      console.log("Error in Bluetooth.startScanning: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.startScanning: " + ex);
       reject(ex);
     }
   });
@@ -596,7 +596,7 @@ Bluetooth.stopScanning = function () {
       }
       resolve();
     } catch (ex) {
-      console.log("Error in Bluetooth.stopScanning: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.stopScanning: " + ex);
       reject(ex);
     }
   });
@@ -606,14 +606,14 @@ Bluetooth._disconnect = function(gatt) {
   if (gatt !== null) {
     var device = gatt.getDevice();
     var stateObject = Bluetooth._connections[device.getAddress()];
-    console.log("----- invoking disc cb");
+    console.log("Ble_advertising ----- invoking disc cb");
     if (stateObject && stateObject.onDisconnected) {
       stateObject.onDisconnected({
         UUID: device.getAddress(),
         name: device.getName()
       });
     } else {
-      console.log("----- !!! no disconnect callback found");
+      console.log("Ble_advertising ----- !!! no disconnect callback found");
     }
     Bluetooth._connections[device.getAddress()] = null;
     gatt.close();
@@ -633,7 +633,7 @@ Bluetooth.connect = function (arg) {
       if (bluetoothDevice === null) {
         reject("Could not find peripheral with UUID " + arg.UUID);
       } else {
-        console.log("Connecting to peripheral with UUID: " + arg.UUID);
+        console.log("Ble_advertising Connecting to peripheral with UUID: " + arg.UUID);
 
         var bluetoothGatt;
         if (android.os.Build.VERSION.SDK_INT < 23 /*android.os.Build.VERSION_CODES.M */) {
@@ -659,7 +659,7 @@ Bluetooth.connect = function (arg) {
         };
       }
     } catch (ex) {
-      console.log("Error in Bluetooth.connect: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.connect: " + ex);
       reject(ex);
     }
   });
@@ -681,7 +681,7 @@ Bluetooth.disconnect = function (arg) {
       Bluetooth._disconnect(connection.device);
       resolve();
     } catch (ex) {
-      console.log("Error in Bluetooth.disconnect: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.disconnect: " + ex);
       reject(ex);
     }
   });
@@ -789,7 +789,7 @@ Bluetooth.read = function (arg) {
         reject("Failed to set client characteristic read for " + characteristicUUID);
       }
     } catch (ex) {
-      console.log("Error in Bluetooth.read: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.read: " + ex);
       reject(ex);
     }
   });
@@ -848,7 +848,7 @@ Bluetooth.write = function (arg) {
         reject("Failed to write to characteristic " + arg.characteristicUUID);
       }
     } catch (ex) {
-      console.log("Error in Bluetooth.write: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.write: " + ex);
       reject(ex);
     }
   });
@@ -888,7 +888,7 @@ Bluetooth.writeWithoutResponse = function (arg) {
         reject("Failed to write to characteristic " + arg.characteristicUUID);
       }
     } catch (ex) {
-      console.log("Error in Bluetooth.writeWithoutResponse: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.writeWithoutResponse: " + ex);
       reject(ex);
     }
   });
@@ -923,7 +923,7 @@ Bluetooth.startNotifying = function (arg) {
       if (!bluetoothGattDescriptor) {
         bluetoothGattDescriptor=new android.bluetooth.BluetoothGattDescriptor(clientCharacteristicConfigId, android.bluetooth.BluetoothGattDescriptor.PERMISSION_WRITE);
         bluetoothGattCharacteristic.addDescriptor(bluetoothGattDescriptor);
-        console.log("BluetoothGattDescriptor created...");
+        console.log("Ble_advertising BluetoothGattDescriptor created...");
         //Any creation error will trigger the global catch. Ok.
       }
 
@@ -938,16 +938,16 @@ Bluetooth.startNotifying = function (arg) {
       }
 
       if (gatt.writeDescriptor(bluetoothGattDescriptor)) {
-        var cb = arg.onNotify || function(result) { console.log("No 'onNotify' callback function specified for 'startNotifying'"); };
+        var cb = arg.onNotify || function(result) { console.log("Ble_advertising No 'onNotify' callback function specified for 'startNotifying'"); };
         var stateObject = Bluetooth._connections[arg.peripheralUUID];
         stateObject.onNotifyCallback = cb;
-        console.log("--- notifying");
+        console.log("Ble_advertising --- notifying");
         resolve();
       } else {
         reject("Failed to set client characteristic notification for " + characteristicUUID);
       }
     } catch (ex) {
-      console.log("Error in Bluetooth.startNotifying: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.startNotifying: " + ex);
       reject(ex);
     }
   });
@@ -968,7 +968,7 @@ Bluetooth.stopNotifying = function (arg) {
       var characteristicUUID = Bluetooth._stringToUuid(arg.characteristicUUID);
 
       var bluetoothGattCharacteristic = Bluetooth._findNotifyCharacteristic(bluetoothGattService, characteristicUUID);
-      console.log("---- got gatt service char: " + bluetoothGattCharacteristic);
+      console.log("Ble_advertising ---- got gatt service char: " + bluetoothGattCharacteristic);
 
       if (!bluetoothGattCharacteristic) {
         reject("Could not find characteristic with UUID " + arg.characteristicUUID + " on service with UUID " + arg.serviceUUID + " on peripheral with UUID " + arg.peripheralUUID);
@@ -985,7 +985,7 @@ Bluetooth.stopNotifying = function (arg) {
       }
 
     } catch (ex) {
-      console.log("Error in Bluetooth.stopNotifying: " + ex);
+      console.log("Ble_advertising Error in Bluetooth.stopNotifying: " + ex);
       reject(ex);
     }
   });
