@@ -430,7 +430,7 @@ Bluetooth._stringToUuid = function(uuidStr) {
 Bluetooth.startAdvertising = function (arg) {
   return new Promise(function (resolve, reject) {
     try {
-      console.log("Ble_advertising start advertising");
+      alert("Ble_advertising start advertising");
       if (!Bluetooth._isEnabled()) {
         reject("Bluetooth is not enabled");
         return;
@@ -470,7 +470,7 @@ Bluetooth.startAdvertising = function (arg) {
       if (!Bluetooth._coarseLocationPermissionGranted()) {
         Bluetooth._requestCoarseLocationPermission();
       } else {
-        _onPermissionGranted();
+        // _onPermissionGranted();
       }
 
     } catch (ex) {
