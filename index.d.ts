@@ -1,5 +1,25 @@
 declare module "nativescript-bluetooth" {
     /**
+     * The options object passed into the startAdvertising function.
+     */
+    export interface StartAdvertisingOptions {
+      advertiseMod: number,
+      isConnectable: boolean,
+      advertiseTimeout: number,
+      txPowerLevel: number,
+      /**
+       * Service which the peripheral will broadcast.
+       */
+      serviceUUID: string;
+
+      /**
+       * The number of seconds to scan for services.
+       * Default: unlimited, which is not really recommended. You should stop scanning manually by calling 'stopScanning'.
+       */
+      characteristic: {uuid: string, value: any};
+    }
+
+    /**
      * The options object passed into the startScanning function.
      */
     export interface StartScanningOptions {
@@ -182,6 +202,9 @@ declare module "nativescript-bluetooth" {
      * @param enable Set to false to reduce console.log messages
      */
     export function setCharacteristicLogging(enable: boolean);
+
+    export function startAdvertising(options: StartAdvertisingOptions): Promise<any>;
+    export function stopAdvertising(): Promise<any>;
 
     export function startScanning(options: StartScanningOptions): Promise<any>;
     export function stopScanning(): Promise<any>;
