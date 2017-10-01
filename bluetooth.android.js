@@ -90,7 +90,32 @@ Bluetooth._connections = {};
   adapter = bluetoothManager.getAdapter();
 
   if (android.os.Build.VERSION.SDK_INT >= 21 /*android.os.Build.VERSION_CODES.LOLLIPOP */) {
-    var MyScanCallback = android.bluetooth.le.ScanCallback.extend({
+    var MyAdvertiseCallback = android.bluetooth.le.AdvertiseCallback.extend({
+      onStartFailure: function(errorCode) {
+        console.log("------- advertiseCallback.onStartFailure errorCode: " + errorCode);
+        var errorMessage;
+        if (errorCode == android.bluetooth.le.AdvertiseCallback.ADVERTISE_FAILED_ALREADY_STARTED) {
+          errorMessage = "Advertisement already started";
+        } else if (errorCode == android.bluetooth.le.AdvertiseCallback.ADVERTISE_FAILED_DATA_TOO_LARGE) {
+          errorMessage = "Advertise data to be broadcasted is larger than 31 bytes";
+        } else if (errorCode == android.bluetooth.le.AdvertiseCallback.ADVERTISE_FAILED_FEATURE_UNSUPPORTED) {
+          errorMessage = "Feature unsupported";
+        } else if (errorCode == android.bluetooth.le.AdvertiseCallback.ADVERTISE_FAILED_INTERNAL_ERROR) {
+          errorMessage = "Internal error";
+        } else if (errorCode == android.bluetooth.le.AdvertiseCallback.ADVERTISE_FAILED_TOO_MANY_ADVERTISERS) {
+          errorMessage = "Internal error";
+        } else {
+          errorMessage = "Advertisement failed to start";
+        }
+        console.log("------- advertiseCallback.onStartFailure errorMessage: " + errorMessage);
+      },
+      onStartSuccess: function(settings) {
+        console.log("Advertisement success -------------");
+        console.log(settings);
+        console.log("-------------");
+      }
+    }),
+    MyScanCallback = android.bluetooth.le.ScanCallback.extend({
       onBatchScanResults: function(results) {
         console.log("------- scanCallback.onBatchScanResults");
       },
@@ -129,6 +154,7 @@ Bluetooth._connections = {};
         }
       }
     });
+    Bluetooth._advertiseCallback = new MyAdvertiseCallback();
     Bluetooth._scanCallback = new MyScanCallback();
   } else {
     Bluetooth._scanCallback = new android.bluetooth.BluetoothAdapter.LeScanCallback({
@@ -399,6 +425,73 @@ Bluetooth._stringToUuid = function(uuidStr) {
     uuidStr = "0000" + uuidStr + "-0000-1000-8000-00805f9b34fb";
   }
   return java.util.UUID.fromString(uuidStr);
+};
+
+Bluetooth.startAdvertising = function (arg) {
+  return new Promise(function (resolve, reject) {
+    try {
+      if (!Bluetooth._isEnabled()) {
+        reject("Bluetooth is not enabled");
+        return;
+      }
+
+      _onPermissionGranted = function() {
+        // Advertise settings
+        var advertiseSettings = new android.bluetooth.le.AdvertiseSettings.Builder();
+
+        var advertiseMod = arg.advertiseMod || android.bluetooth.le.AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY;
+        advertiseSettings.setAdvertiseMode(advertiseMod);
+        
+        var isConnectable = arg.isConnectable || true;
+        advertiseSettings.setConnectable(isConnectable);
+        
+        var advertiseTimeout = arg.advertiseTimeout || 10000;
+        advertiseSettings.setTimeout(advertiseTimeout);
+        
+        var txPowerLevel = arg.txPowerLevel || android.bluetooth.le.AdvertiseSettings.ADVERTISE_TX_POWER_HIGH;
+        advertiseSettings.setTxPowerLevel(txPowerLevel);
+
+        // Advertise data
+        var advertiseData = new android.bluetooth.le.AdvertiseData.Builder();
+        
+        advertiseData.addServiceUuid(arg.serviceUUID);      
+        advertiseData.addServiceData(arg.characteristic.uuid, arg.characteristic.value);
+
+        adapter.getBluetoothLeScanner().startAdvertising(advertiseSettings.build(), advertiseData.build(), Bluetooth._advertiseCallback);
+      };
+
+      // log a warning when on Android M and no permission has been granted (it's up to the dev to implement that flow though)
+      if (!Bluetooth._coarseLocationPermissionGranted()) {
+        Bluetooth._requestCoarseLocationPermission();
+      } else {
+        _onPermissionGranted();
+      }
+
+    } catch (ex) {
+      console.log("Error in Bluetooth.startAdvertising: " + ex);
+      reject(ex);
+    }
+  });
+};
+
+Bluetooth.stopAdvertising = function () {
+  return new Promise(function (resolve, reject) {
+    try {
+      if (!Bluetooth._isEnabled()) {
+        reject("Bluetooth is not enabled");
+        return;
+      }
+      if (android.os.Build.VERSION.SDK_INT < 21 /* android.os.Build.VERSION_CODES.LOLLIPOP */) {
+        // TODO
+      } else {
+        adapter.getBluetoothLeScanner().stopAdvertising(Bluetooth._advertiseCallback);
+      }
+      resolve();
+    } catch (ex) {
+      console.log("Error in Bluetooth.stopAdvertising: " + ex);
+      reject(ex);
+    }
+  });
 };
 
 Bluetooth.startScanning = function (arg) {
