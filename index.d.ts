@@ -3,18 +3,17 @@ declare module "nativescript-bluetooth" {
      * The options object passed into the startAdvertising function.
      */
     export interface StartAdvertisingOptions {
-      advertiseMod: number,
-      isConnectable: boolean,
-      advertiseTimeout: number,
-      txPowerLevel: number,
+      advertiseMod?: number,
+      isConnectable?: boolean,
+      advertiseTimeout?: number,
+      txPowerLevel?: number,
       /**
        * Service which the peripheral will broadcast.
        */
       serviceUUID: string;
 
       /**
-       * The number of seconds to scan for services.
-       * Default: unlimited, which is not really recommended. You should stop scanning manually by calling 'stopScanning'.
+       * Characteristic which the peripheral will broadcast
        */
       characteristic: {uuid: string, value: any};
     }
