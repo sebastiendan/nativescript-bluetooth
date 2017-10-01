@@ -437,6 +437,7 @@ Bluetooth.startAdvertising = function (arg) {
       }
 
       _onPermissionGranted = function() {
+        console.log("Ble_advertising permission granted");
         // Advertise settings
         var advertiseSettings = new android.bluetooth.le.AdvertiseSettings.Builder();
 
@@ -452,11 +453,15 @@ Bluetooth.startAdvertising = function (arg) {
         var txPowerLevel = arg.txPowerLevel || android.bluetooth.le.AdvertiseSettings.ADVERTISE_TX_POWER_HIGH;
         advertiseSettings.setTxPowerLevel(txPowerLevel);
 
+        console.log("Ble_advertising settings", advertiseSettings);
+
         // Advertise data
         var advertiseData = new android.bluetooth.le.AdvertiseData.Builder();
         
         advertiseData.addServiceUuid(arg.serviceUUID);      
         advertiseData.addServiceData(arg.characteristic.uuid, arg.characteristic.value);
+
+        console.log("Ble_advertising data", advertiseData);
 
         adapter.getBluetoothLeScanner().startAdvertising(advertiseSettings.build(), advertiseData.build(), Bluetooth._advertiseCallback);
       };
